@@ -54,6 +54,7 @@ function Classroom({
       {boardText && (
         <Text
           position={[-3.2, 3.35, -2.97]}
+          font="/fonts/Chalkduster.ttf"
           fontSize={0.22}
           color="#f5f5f0"
           anchorX="left"
@@ -64,7 +65,6 @@ function Classroom({
           {boardText}
         </Text>
       )}
-
       <Character target={charTarget} />
 
       <OrbitControls
