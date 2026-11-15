@@ -25,16 +25,17 @@ async def teacher_socket(ws: WebSocket):
             user_msg = await ws.receive_text()
             print(f"Received: {user_msg}")
 
-            # TEMP: hardcoded response — replace with LLM call later
             await ws.send_json({
-                "type": "command",
                 "action": "speak",
                 "params": {"text": f"You said: {user_msg}"},
             })
             await ws.send_json({
-                "type": "command",
+                "action": "move_character",
+                "params": {"x": 1.5, "y": 0.5, "z": -1.5},
+            })
+            await ws.send_json({
                 "action": "write_on_board",
-                "params": {"text": "Hello!", "x": 0, "y": 1.8},
+                "params": {"text": f"Q: {user_msg}", "x": 0, "y": 0},
             })
     except WebSocketDisconnect:
         print("Client disconnected")
