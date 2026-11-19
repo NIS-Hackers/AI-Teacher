@@ -81,18 +81,28 @@ export default function App() {
   const [charTarget, setCharTarget] = useState<[number, number, number]>([0, 0.5, 0])
   const [boardText, setBoardText] = useState('')
   const [input, setInput] = useState('')
+  const [error, setError] = useState('')
+  const [caption, setCaption] = useState('')
 
   const speak = (text: string) => {
-    if (!('speechSynthesis' in window)) return
+    setCaption(text)
+    if (!('speechSynthesis' in window)) {
+      setError('Speech output is not supported in this browser.')
+      return
+    }
     window.speechSynthesis.cancel()
     const u = new SpeechSynthesisUtterance(text)
     u.rate = 1.0
     u.pitch = 1.0
+    u.onerror = () => setError('Speech output failed. Check your browser audio settings.')
     window.speechSynthesis.speak(u)
   }
 
   const handleCommand = (cmd: TeacherCommand) => {
     switch (cmd.action) {
+      case 'error':
+        setError(cmd.params.text)
+        break
       case 'move_character':
         setCharTarget([cmd.params.x, cmd.params.y, cmd.params.z])
         break
@@ -111,8 +121,14 @@ export default function App() {
     e.preventDefault()
     const text = input.trim()
     if (!text) return
-    send(text)
-    setInput('')
+    if (send(text)) {
+      setBoardText((prev) => (prev ? prev + '\n' : '') + `Q: ${text}`)
+      setError('')
+      setCaption('')
+      setInput('')
+    } else {
+      setError('Not connected to the teacher server. Reconnecting...')
+    }
   }
 
   return (
@@ -137,6 +153,40 @@ export default function App() {
           fontFamily: 'system-ui, sans-serif',
         }}
       >
+        {caption && (
+          <div
+            aria-live="polite"
+            style={{
+              position: 'absolute',
+              bottom: '100%',
+              left: 0,
+              marginBottom: 8,
+              maxWidth: 'min(720px, 90vw)',
+              padding: '8px 12px',
+              borderRadius: 8,
+              background: 'rgba(0, 0, 0, 0.75)',
+              color: '#fff',
+              fontSize: 14,
+            }}
+          >
+            {caption}
+          </div>
+        )}
+        {error && (
+          <div
+            role="alert"
+            style={{
+              position: 'absolute',
+              bottom: '100%',
+              left: 0,
+              marginBottom: 8,
+              color: '#fca5a5',
+              fontSize: 14,
+            }}
+          >
+            {error}
+          </div>
+        )}
         <form onSubmit={onSubmit} style={{ display: 'flex', flex: 1, gap: 8 }}>
           <input
             value={input}

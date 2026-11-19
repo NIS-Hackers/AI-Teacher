@@ -1,16 +1,30 @@
-# AI Teacher — Backend
+# AI Teacher
 
-## Setup (uv — recommended)
+## Backend setup
 
 Install uv: https://docs.astral.sh/uv/getting-started/installation/
 
+In a terminal from the repository root:
+
     cd backend
     uv sync
-    uv run uvicorn app.main:app --reload --port 8000
+    uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
 Server runs at http://localhost:8000 (docs at /docs).
 
-## Setup (pip fallback)
+Set `GEMINI_API_KEY` in `backend/.env` before sending messages to the teacher.
+
+## Frontend setup
+
+Open a second terminal from the repository root:
+
+    cd frontend
+    npm ci
+    npm run dev -- --host 127.0.0.1 --port 5173
+
+Open http://127.0.0.1:5173. Keep both terminals running while using the app.
+
+## Backend setup (pip fallback)
 
     cd backend
     python3 -m venv .venv
